@@ -15,7 +15,6 @@ setup(
           'yfinance',
           'pandas',
           'bs4',
-          're',
           'requests',
           'xlwt',
           'finviz',
