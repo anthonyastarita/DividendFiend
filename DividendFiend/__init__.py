@@ -1,1 +1,1 @@
-from DividendFiend.StockInfo import StockInfo
+from StockInfo import StockInfo
