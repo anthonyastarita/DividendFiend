@@ -1,6 +1,17 @@
+import yfinance as yf
+import pandas as pd
+import bs4
+import re
+import requests
+import xlwt
+import finviz
+
 class StockInfo:
     
-    def percentToDecimal(rawData):
+    def test(self):
+        print("hi")
+    
+    def percentToDecimal(self, rawData):
         listData = [str(s) for s in rawData]
 
         if listData[-1] == '%':
@@ -9,29 +20,29 @@ class StockInfo:
             strData = "".join(listData)
         return float(strData)
     
-    def fillCompany(finvizData, ticker):
+    def fillCompany(self, finvizData, ticker):
         return finvizData["Company"]
     
-    def fillAnnualDiv(finvizData, ticker):
-        return percentToDecimal(finvizData["Dividend"])
+    def fillAnnualDiv(self, finvizData, ticker):
+        return self.percentToDecimal(finvizData["Dividend"])
     
-    def fillPrice(finvizData, ticker):
+    def fillPrice(self, finvizData, ticker):
         return finvizData["Price"]
     
-    def fillPayout(finvizData, ticker):
-        return percentToDecimal(finvizData["Payout"])
+    def fillPayout(self, finvizData, ticker):
+        return self.percentToDecimal(finvizData["Payout"])
     
-    def fillPBRatio(finvizData, ticker):
-        return percentToDecimal(finvizData["P/B"])
+    def fillPBRatio(self, finvizData, ticker):
+        return self.percentToDecimal(finvizData["P/B"])
     
-    def fillDebtRatio(finvizData, ticker):
-        return percentToDecimal(finvizData["Debt/Eq"])
+    def fillDebtRatio(self, finvizData, ticker):
+        return self.percentToDecimal(finvizData["Debt/Eq"])
 
-    def fillPERatio(finvizData, ticker):
-        return percentToDecimal(finvizData["P/E"])
+    def fillPERatio(self, finvizData, ticker):
+        return self.percentToDecimal(finvizData["P/E"])
     
     
-    def normalizeDividendsPerYear(dividends, splits):
+    def normalizeDividendsPerYear(self, dividends, splits):
         dividendPerYear = {}
 
         masterActions = {}
@@ -84,11 +95,11 @@ class StockInfo:
     
     def getAvgDiv(ticker):
         yfinanceTickerData = yf.Ticker(ticker)
-        divss = normalizeDividendsPerYear(yfinanceTickerData.dividends, yfinanceTickerData.splits)
+        divss = self.normalizeDividendsPerYear(yfinanceTickerData.dividends, yfinanceTickerData.splits)
         return (divss[1])
     
     
-    def fillConsecutiveDividendYears(ticker):
+    def fillConsecutiveDividendYears(self, ticker):
         url = "https://seekingalpha.com/symbol/"+ ticker +"/dividends/scorecard"
         r = requests.get(url, allow_redirects=True, verify = False)
 
@@ -102,10 +113,10 @@ class StockInfo:
         return rawSAData[secondOccur+17:secondOccur+19]
     
     
-    def fillDividendGrowthPerYear(yfinanceTickerData, ticker):
+    def fillDividendGrowthPerYear(self, yfinanceTickerData, ticker):
         
         #lets get a dictionary with a dividend per year
-        tickerDivYearDict = normalizeDividendsPerYear(yfinanceTickerData.dividends, yfinanceTickerData.splits)[0]
+        tickerDivYearDict = self.normalizeDividendsPerYear(yfinanceTickerData.dividends, yfinanceTickerData.splits)[0]
 
         divGrowths = []
 
@@ -119,7 +130,7 @@ class StockInfo:
 
         return (sum(divGrowths)/len(divGrowths))
     
-    def fillEPSGrowthRate(ticker):
+    def fillEPSGrowthRate(self, ticker):
         EPS=[]
 
         url = "http://www.marketwatch.com/investing/stock/"+ticker+"/financials"
@@ -147,21 +158,26 @@ class StockInfo:
 #-----------
     
     def getStockInfo(self, ticker):
+              
+        self.test()
+              
+              
         info = {}
         
         finvizTickerData = finviz.get_stock(ticker)
         yfinanceTickerData = yf.Ticker(ticker)
         
         info["Ticker"] = ticker
-        info["Price"] = fillPrice(ticker)
-        info["Dividend"] = fillAnnualDiv(finvizTickerData, ticker)
-        info["Company"] = fillCompany(finvizTickerData, ticker)
-        info["EPS Growth"] = fillEPSGrowthRate(ticker)
-        info["Dividend Growth"] = fillDividendGrowthPerYear(yfinanceTickerData, ticker)
-        info["Payout"] = fillPayout(finvizTickerData, ticker)
-        info["Debt"] = fillDebtRatio(finvizData, ticker)
-        info["PE"] = fillPERatio(finvizTickerData, ticker)
-        info["PB"] = fillPBRatio(finvizTickerData, ticker)
+        info["Price"] = self.fillPrice(finvizTickerData, ticker)
+        info["Dividend"] = self.fillAnnualDiv(finvizTickerData, ticker)
+        info["Company"] = self.fillCompany(finvizTickerData, ticker)
+        info["EPS Growth"] = self.fillEPSGrowthRate(ticker)
+        info["Dividend Growth"] = self.fillDividendGrowthPerYear(yfinanceTickerData, ticker)
+        info["Payout"] = self.fillPayout(finvizTickerData, ticker)
+        info["Debt"] = self.fillDebtRatio(finvizTickerData, ticker)
+        info["PE"] = self.fillPERatio(finvizTickerData, ticker)
+        info["PB"] = self.fillPBRatio(finvizTickerData, ticker)
         
         return info
+
 
