@@ -54,6 +54,28 @@ for ticker in tickers:
  These are all of the Dividend Aristocrats (Stocks that have increased their dividend payouts for 25+ consecutive years)
  
  ```
+ def meetsCriteria(ticker):
+    stockData = stockInfo.getStockInfo(ticker)
+    criteria = 0
+    
+    if stockData["EPS Growth"] > 8:
+        criteria += 1
+    if stockData["Dividend Growth"] > 8:
+        criteria += 1
+    if stockData["Payout"] < 75:
+        criteria += 1
+    if stockData["Debt"] < 70:
+        criteria += 1
+    if stockData["PE"] < 25:
+        criteria += 1
+    if stockData["PB"] < 3:
+        criteria += 1
+    if stockData["under or over valued"] == "Undervalued":
+        criteria += 1
+        
+    if criteria > 5:
+        return True
+        
  tickers = ["GPC", "DOV", "EMR", "PG", "MMM", "CINF", "KO", "JNJ", "LOW", "CL", "HRL", "TGT", "SWK", "SYY", "BDX", "LEG", "PPG", "GWW", "KMB", "PEP", "VFC", "ABBV", "NUE", "SPGI", "ABT", "WMT", "ED", "ITW", "ADM", "ADP", "WBA", "MCD", "PNR", "CLX", "MDT", "SHW", "BEN", "AFL", "CTAS", "XOM", "ATO", "TROW", "MKC", "CVX", "GD", "ECL", "LIN", "PBCT", "ROP", "O", "AOS", "CAT", "CB", "RTX", "OTIS", "CARR", "ESS", "EXPD", "ROST", "ALB", "AMCR"] 
 
 for ticker in tickers:
