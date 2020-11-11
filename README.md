@@ -41,12 +41,27 @@ getStockInfo("AAPL")
  
  Use this boilerplate code to use the file tickerList.xls (a curated list of a few thousand stocks) to iterate through and get dividend stocks that meet your criteria
  ```
+import pandas as pd
+
 xls = pd.ExcelFile("tickerList.xls")
 sheetX = xls.parse(0)
 tickers = sheetX['Tickers']
 
 for ticker in tickers:
-    print(test.getStockInfo(ticker))
+    print(stockInfo.getStockInfo(ticker))
+ ```
+ 
+ These are all of the Dividend Aristocrats (Stocks that have increased their dividend payouts for 25+ consecutive years)
+ 
+ ```
+ tickers = ["GPC", "DOV", "EMR", "PG", "MMM", "CINF", "KO", "JNJ", "LOW", "CL", "HRL", "TGT", "SWK", "SYY", "BDX", "LEG", "PPG", "GWW", "KMB", "PEP", "VFC", "ABBV", "NUE", "SPGI", "ABT", "WMT", "ED", "ITW", "ADM", "ADP", "WBA", "MCD", "PNR", "CLX", "MDT", "SHW", "BEN", "AFL", "CTAS", "XOM", "ATO", "TROW", "MKC", "CVX", "GD", "ECL", "LIN", "PBCT", "ROP", "O", "AOS", "CAT", "CB", "RTX", "OTIS", "CARR", "ESS", "EXPD", "ROST", "ALB", "AMCR"] 
+
+for ticker in tickers:
+    try:
+        if meetsCriteria(ticker):
+            print(ticker, stockInfo.getStockInfo(ticker))
+    except:
+        continue
  ```
  
  # Sample stock criteria
