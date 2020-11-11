@@ -15,7 +15,7 @@ stockInfo.getStockInfo(<insert ticker here>)
 
 This package only has 1 public function: 
 
-getStockInfo(<ticker>)
+getStockInfo(ticker)
 
 ```
 getStockInfo("AAPL")
