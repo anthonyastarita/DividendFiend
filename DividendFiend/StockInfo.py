@@ -7,10 +7,7 @@ import xlwt
 import finviz
 
 class StockInfo:
-    
-    def test(self):
-        print("hi")
-    
+
     def percentToDecimal(self, rawData):
         listData = [str(s) for s in rawData]
 
@@ -93,24 +90,22 @@ class StockInfo:
         return [dividendPerYear, sum(divs)/len(divs)]
     
     
-    def getAvgDiv(ticker):
-        yfinanceTickerData = yf.Ticker(ticker)
-        divss = self.normalizeDividendsPerYear(yfinanceTickerData.dividends, yfinanceTickerData.splits)
+    def getAvgDiv(self, yfinance, ticker):
+        divss = self.normalizeDividendsPerYear(yfinance.dividends, yfinance.splits)
         return (divss[1])
     
     
     def fillConsecutiveDividendYears(self, ticker):
         url = "https://seekingalpha.com/symbol/"+ ticker +"/dividends/scorecard"
         r = requests.get(url, allow_redirects=True, verify = False)
-
         soup = bs4.BeautifulSoup(r.content, "lxml")
         text = soup.findAll(text = True)
-        rawSAData = text[178]
+        rawSAData = text
         strSAD = (str(rawSAData))
-        divOccurs = [m.start() for m in re.finditer('dividend_growth', strSAD)]
-        secondOccur = divOccurs[1]
+        divOccurs = [m.start() for m in re.finditer('Years of Dividend Growth', strSAD)]
+        occur = divOccurs[0]
 
-        return rawSAData[secondOccur+17:secondOccur+19]
+        return self.percentToDecimal(strSAD[occur+40:occur+43])
     
     
     def fillDividendGrowthPerYear(self, yfinanceTickerData, ticker):
@@ -121,12 +116,9 @@ class StockInfo:
         divGrowths = []
 
         for year in tickerDivYearDict.keys():
-    #         print(year, year.type())
             year = int(year-1)
             if year - 1 in tickerDivYearDict.keys() and year > 2000:
                 divGrowths.append((tickerDivYearDict[year]/tickerDivYearDict[year-1]) - 1)
-    #             print(year, (tickerDivYearDict[year]/tickerDivYearDict[year-1]) - 1, tickerDivYearDict[year], tickerDivYearDict[year-1])
-
 
         return (sum(divGrowths)/len(divGrowths))
     
@@ -155,28 +147,84 @@ class StockInfo:
 
         return (sum(EPSClean)/len(EPSClean))
     
+    
+    def underOrOver(self, finvizTickerData, yfinance, ticker):
+        try:
+            if self.fillAnnualDiv(finvizTickerData, ticker) > self.getAvgDiv(yfinance, ticker):
+                return "Undervalued"
+            else:
+                return "Overvalued"
+        except:
+            return "-"
+    
 #-----------
     
     def getStockInfo(self, ticker):
-              
-        self.test()
-              
-              
+        
         info = {}
         
         finvizTickerData = finviz.get_stock(ticker)
         yfinanceTickerData = yf.Ticker(ticker)
         
-        info["Ticker"] = ticker
-        info["Price"] = self.fillPrice(finvizTickerData, ticker)
-        info["Dividend"] = self.fillAnnualDiv(finvizTickerData, ticker)
-        info["Company"] = self.fillCompany(finvizTickerData, ticker)
-        info["EPS Growth"] = self.fillEPSGrowthRate(ticker)
-        info["Dividend Growth"] = self.fillDividendGrowthPerYear(yfinanceTickerData, ticker)
-        info["Payout"] = self.fillPayout(finvizTickerData, ticker)
-        info["Debt"] = self.fillDebtRatio(finvizTickerData, ticker)
-        info["PE"] = self.fillPERatio(finvizTickerData, ticker)
-        info["PB"] = self.fillPBRatio(finvizTickerData, ticker)
+        try:
+            info["Ticker"] = ticker
+        except:
+            info["Ticker"] = "-"
+    
+        try:
+            info["Company"] = self.fillCompany(finvizTickerData, ticker)
+        except:
+            info["Company"] = "-"
+            
+        try:
+            info["Price"] = self.fillPrice(finvizTickerData, ticker)
+        except:
+            info["Price"] = "-"
+            
+        try:
+            info["Dividend"] = self.fillAnnualDiv(finvizTickerData, ticker)
+        except:
+            info["Dividend"] = "-"
+            
+        try:
+            info["EPS Growth"] = self.fillEPSGrowthRate(ticker)
+        except:
+            info["EPS Growth"] = "-"
+            
+        try:
+            info["Dividend Growth"] = self.fillDividendGrowthPerYear(yfinanceTickerData, ticker)
+        except:
+            info["Dividend Growth"] = "-"
+        
+        try:
+            info["Payout"] = self.fillPayout(finvizTickerData, ticker)
+        except:
+            info["Payout"] = "-"
+        
+        try:
+            info["Debt"] = self.fillDebtRatio(finvizTickerData, ticker)
+        except:
+            info["Debt"] = "-"
+        
+        try:
+            info["PE"] = self.fillPERatio(finvizTickerData, ticker)
+        except:
+            info["PE"] = "-"
+        
+        try:
+            info["PB"] = self.fillPBRatio(finvizTickerData, ticker)
+        except:
+            info["PB"] = "-"
+            
+        try:
+            info["under or over valued"] = self.underOrOver(finvizTickerData, yfinanceTickerData, ticker)
+        except:
+            info["under or over valued"] = "-"
+        
+        try:
+            info["Consecutive Years of Div Inc"] = self.fillConsecutiveDividendYears(ticker)
+        except:
+            info["Consecutive Years of Div Inc"] = "-"
         
         return info
 
