@@ -37,7 +37,7 @@ getStockInfo("AAPL")
  We grab data from finviz, marketwatch, seeking alpha to bring you concise and useful dividend stock data.
  
  
- # Use as a screener
+ # Use As a Screener
  
  Use this boilerplate code to use the file tickerList.xls (a curated list of a few thousand stocks) to iterate through and get dividend stocks that meet your criteria
  ```
@@ -86,7 +86,7 @@ for ticker in tickers:
         continue
  ```
  
- # Sample stock criteria
+ # Sample Stock Criteria
  
 An undervalued dividend stock might have most or all of these criteria:
 
